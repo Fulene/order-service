@@ -6,6 +6,8 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Collection;
+
 @FeignClient(name="inventory-service")
 public interface InventoryRestClientService {
 
@@ -13,6 +15,9 @@ public interface InventoryRestClientService {
     Product findById(@PathVariable Long id);
 
     @GetMapping("/products?projection=fullProduct")
-    PagedModel<Product> findPage();
+    PagedModel<Product> findAll();
+
+    @GetMapping("/products/{ids}?projection=fullProduct")
+    PagedModel<Product> findAllById(@PathVariable Collection<Long> ids);
 
 }

@@ -30,9 +30,11 @@ public class OrderService {
     }
 
     public void populateDb() {
-        var customers = customerRestClientService.findPage().getContent().stream().toList();
-        var products = inventoryRestClientService.findPage().getContent().stream().toList();
+        var customers = customerRestClientService.findAll().getContent().stream().toList();
+        var products = inventoryRestClientService.findAll().getContent().stream().toList();
         var random = new Random();
+
+        System.out.println(customers.size() + ", " + products.size());
 
         for (int i = 0; i < 20; i++) {
             var order = Order.builder()
@@ -64,4 +66,20 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
+    public Order getOrderDetails(Long id) {
+        var order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("No order for id " + id));
+
+        order.setCustomer(customerRestClientService.findById(order.getCustomerId()));
+
+        var orderProducts = inventoryRestClientService.findAllById(
+            order.getProductItems().stream().map(ProductItem::getProductId).toList()
+        ).getContent();
+
+        order.getProductItems().forEach(item -> {
+            var correspondingProduct = orderProducts.stream().filter(p -> p.getId().equals(item.getId())).findFirst().orElseThrow(() -> new RuntimeException("Failed to find the corresponding product"));
+            item.setProduct(correspondingProduct);
+        });
+
+        return order;
+    }
 }
