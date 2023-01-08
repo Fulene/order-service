@@ -22,7 +22,6 @@ public class OrderServiceApplication implements CommandLineRunner {
     @Override
     public void run(String... args) {
         orderService.populateDb();
-        orderService.findAll().forEach(System.out::println);
     }
 
 }

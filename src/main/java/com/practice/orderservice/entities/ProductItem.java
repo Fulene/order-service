@@ -1,5 +1,6 @@
 package com.practice.orderservice.entities;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.practice.orderservice.model.Product;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,7 @@ public class ProductItem {
     private int quantity;
     private double discount;
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Order order;
 
 }

@@ -10,7 +10,6 @@ import com.practice.orderservice.services.rest.CustomerRestClientService;
 import com.practice.orderservice.services.rest.InventoryRestClientService;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Random;
 
@@ -33,8 +32,6 @@ public class OrderService {
         var customers = customerRestClientService.findAll().getContent().stream().toList();
         var products = inventoryRestClientService.findAll().getContent().stream().toList();
         var random = new Random();
-
-        System.out.println(customers.size() + ", " + products.size());
 
         for (int i = 0; i < 20; i++) {
             var order = Order.builder()
@@ -62,23 +59,20 @@ public class OrderService {
 
     }
 
-    public Collection<Order> findAll() {
-        return orderRepository.findAll();
-    }
-
     public Order getOrderDetails(Long id) {
         var order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("No order for id " + id));
 
         order.setCustomer(customerRestClientService.findById(order.getCustomerId()));
 
-        var orderProducts = inventoryRestClientService.findAllById(
-            order.getProductItems().stream().map(ProductItem::getProductId).toList()
-        ).getContent();
+//        var ids = order.getProductItems().stream().map(ProductItem::getProductId).toList();
+//        var orderProducts = inventoryRestClientService.findAllById(ids).getContent();
+//
+//        order.getProductItems().forEach(item -> {
+//            var correspondingProduct = orderProducts.stream().filter(p -> p.getId().equals(item.getId())).findFirst().orElseThrow(() -> new RuntimeException("Failed to find the corresponding product"));
+//            item.setProduct(correspondingProduct);
+//        });
 
-        order.getProductItems().forEach(item -> {
-            var correspondingProduct = orderProducts.stream().filter(p -> p.getId().equals(item.getId())).findFirst().orElseThrow(() -> new RuntimeException("Failed to find the corresponding product"));
-            item.setProduct(correspondingProduct);
-        });
+        order.getProductItems().forEach(item -> item.setProduct(inventoryRestClientService.findById(item.getProductId())));
 
         return order;
     }
