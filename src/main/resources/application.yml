@@ -6,3 +6,20 @@ spring:
     name: order-service
   config:
     import: optional:configserver:http://localhost:8888
+
+# OpenFeign logs
+logging:
+  level:
+    com:
+      practice:
+        orderservice:
+          services:
+            rest:
+              CustomerRestClientService: debug
+              InventoryRestClientService: debug
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: full
